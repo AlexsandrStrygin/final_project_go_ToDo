@@ -23,7 +23,7 @@ func formatDate(dateStr string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return date.Format("20060102"), nil
+	return date.Format(DateFormat), nil
 }
 
 // GetTasksHandler получает список задач

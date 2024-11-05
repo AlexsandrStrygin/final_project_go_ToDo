@@ -10,9 +10,9 @@ import (
 )
 
 func NextDate(now time.Time, date string, repeat string) (string, error) {
-	fmt.Printf("Now: %s, Date: %s, Repeat: %s\n", now.Format("20060102"), date, repeat)
+	fmt.Printf("Now: %s, Date: %s, Repeat: %s\n", now.Format(DateFormat), date, repeat)
 
-	parsedDate, err := time.Parse("20060102", date)
+	parsedDate, err := time.Parse(DateFormat, date)
 	if err != nil {
 		return "", errors.New("некорректная дата")
 	}
@@ -66,7 +66,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		return "", nil
 	}
 
-	nextDateFormatted := nextDate.Format("20060102")
+	nextDateFormatted := nextDate.Format(DateFormat)
 	fmt.Printf("Calculated next date: %s\n", nextDateFormatted)
 	return nextDateFormatted, nil
 }
@@ -102,7 +102,7 @@ func handleWeekRule(date time.Time, now time.Time, parts []string) (string, erro
 
 			if weekDay == dayInt && nextDate.After(now) {
 				// Если совпадает день недели и дата после now
-				return nextDate.Format("20060102"), nil
+				return nextDate.Format(DateFormat), nil
 			}
 
 			// Переход к следующему дню
@@ -186,7 +186,7 @@ func handleMonthRule(now time.Time, date time.Time, parts []string) (string, err
 		return validDates[i].Before(validDates[j]) // Сортировка по времени
 	})
 
-	return validDates[0].Format("20060102"), nil // Форматируем и возвращаем дату
+	return validDates[0].Format(DateFormat), nil // Форматируем и возвращаем дату
 }
 
 // lastDayInMonth вычисляет последний день месяца с учетом високосного года

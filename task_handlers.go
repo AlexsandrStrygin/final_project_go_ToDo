@@ -2,8 +2,9 @@ package main
 
 import (
     "net/http"
-    "github.com/jmoiron/sqlx"
     "time"
+
+    "github.com/jmoiron/sqlx"
 )
 
 // Обработчик для выполнения задачи

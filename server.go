@@ -13,11 +13,10 @@ import (
 
 // Эта функция настраивает маршруты
 func setupRoutes(db *sqlx.DB) {
-    // Обработчик корневого маршрута
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        http.Redirect(w, r, "/scheduler", http.StatusFound) // Перенаправление на /scheduler
-    })
-    
+         // Обработка всех статических файлов из папки "web/"
+    fs := http.FileServer(http.Dir("web/"))
+    http.Handle("/", fs)
+
     // Обработчик для выполнения задачи
     http.HandleFunc("/api/task/done", DoneTaskHandler(db))
 
@@ -40,25 +39,16 @@ func setupRoutes(db *sqlx.DB) {
     http.HandleFunc("/api/nextdate", nextDateHandler)
     http.HandleFunc("/api/tasks", GetTasksHandler(db)) // Обработчик для получения всех задач
     http.HandleFunc("/scheduler", SchedulerHandler(db)) // Обработчик для страницы планировщика
-    http.Handle("/favicon.ico", http.FileServer(http.Dir("web/"))) // Обработчик для favicon
-
-    // Обработка статических файлов CSS
-    http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("web/css"))))
-
-    // Обработка статических файлов JS
-    http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("web/js"))))
-}
+    }
 
 // Обработчик для маршрута /scheduler
 func SchedulerHandler(db *sqlx.DB) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
-        // Логирование пути и метода запроса
-        log.Printf("Received request for: %s with method: %s", r.URL.Path, r.Method)
 
         if r.Method == http.MethodGet {
             // Загрузка данных из базы данных
             var tasks []Scheduler
-            err := db.Select(&tasks, "SELECT * FROM scheduler")
+            err := db.Select(&tasks, "SELECT id, title, comment, repeat FROM scheduler")
             if err != nil {
                 log.Printf("Error getting tasks from database: %v", err) // Логирование ошибки получения задач
                 http.Error(w, "Ошибка при получении задач", http.StatusInternalServerError)

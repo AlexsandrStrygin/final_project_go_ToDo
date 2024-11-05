@@ -23,32 +23,17 @@ func initDatabase(dbFile string) error {
     }
     defer db.Close()
 
-    // Проверяем, существует ли таблица
-    var tableExists string
-    err = db.Get(&tableExists, "SELECT name FROM sqlite_master WHERE type='table' AND name='scheduler'")
-    if err != nil || tableExists == "" {
-        schema := `CREATE TABLE scheduler (
+    // Создаём таблицу, если она не существует
+    _, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS scheduler (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT NOT NULL,
             title TEXT NOT NULL,
             comment TEXT,
-            repeat TEXT CHECK(length(repeat) <= 128)
-        );`
+            repeat TEXT
+        )
+    `)
 
-        // Создание таблицы
-        _, err = db.Exec(schema)
-        if err != nil {
-            return err
-        }
-
-        // Создание индекса
-        _, err = db.Exec(`CREATE INDEX IF NOT EXISTS idx_date ON scheduler (date);`)
-        if err != nil {
-            return err
-        }
-    }
-
-    return nil
+    return err
 }
 
 // AddScheduler добавляет новую задачу в таблицу

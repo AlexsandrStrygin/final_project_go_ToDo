@@ -56,13 +56,13 @@ func UpdateTaskHandler(db *sqlx.DB) http.HandlerFunc {
         }
 
         now := time.Now()
-        today := now.Format("20060102")
+        today := now.Format(DateFormat)
 
         if task.Date == "" {
             task.Date = today
         }
 
-        taskDate, err := time.Parse("20060102", task.Date)
+        taskDate, err := time.Parse(DateFormat, task.Date)
         if err != nil {
             writeError(w, "Неверный формат даты, ожидается формат YYYYMMDD", http.StatusBadRequest)
             return
